@@ -1,3 +1,52 @@
+# E-commerce Customer Support Chatbot with Retrieval-Augmented Generation (RAG)
+
+This project implements an intelligent customer support chatbot for an e-commerce store using Retrieval-Augmented Generation (RAG). The chatbot leverages a pre-trained Large Language Model (LLM) combined with a vector database of product information and frequently asked questions (FAQs) to provide accurate and helpful answers to user queries.
+
+## Project Description
+
+The chatbot is designed to enhance the customer support experience by providing instant answers to common questions about products, shipping, returns, and other store policies. It utilizes the following core components:
+
+*   **Retrieval-Augmented Generation (RAG):** Combines the power of a pre-trained LLM with a specialized knowledge base to retrieve relevant information and generate contextually appropriate responses.
+*   **Vector Database (FAISS):** Stores embeddings of product information and FAQs, enabling efficient similarity search to find the most relevant context for a given query.
+*   **Large Language Model (LLM):** Uses the Mistral-7B-Instruct-v0.2 model from Hugging Face Transformers to generate human-like responses based on the retrieved context and the user's question.
+*   **Sentence Transformers:** Employs the `sentence-transformers/all-mpnet-base-v2` model to create high-quality sentence embeddings for efficient information retrieval.
+*   **Streamlit:**  A user-friendly web application framework for building and deploying the chatbot interface.
+*   **Hugging Face Spaces:** The chatbot is deployed on Hugging Face Spaces for easy accessibility and demonstration.
+
+## Demo
+
+Experience the live chatbot demo here: [Link to your Hugging Face Spaces app] (Replace with the actual link once deployed)
+
+## Dataset
+
+This project utilizes the **AmazonQA dataset**, a large-scale collection of question-answer pairs related to Amazon products.
+
+**Dataset Source:** [https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA](https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA)
+
+**Download Instructions:**
+
+The dataset is not included in this repository due to its size. Please follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the dataset.
+
+## Project Structure
+
+```
+ecommerce-support-chatbot/
+├── data/
+│ └── AmazonQA/ (Place the downloaded AmazonQA dataset files here)
+│ └── faq/ (Optional: Add any additional FAQ documents here)
+│ └── HOW_TO_DOWNLOAD_DATA.md (Instructions for downloading the dataset)
+├── model/ (Directory for storing the downloaded LLM and sentence-transformer model)
+├── vectorstore/ (Directory for storing the FAISS index)
+├── notebooks/
+│ └── chatbot_development.ipynb (Colab notebook for development and experimentation)
+├── src/
+│ ├── app.py (Streamlit application script)
+│ ├── train.py (Script for creating the vector store)
+│ └── download_data.py (Script to download the AmazonQA dataset)
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
 
 ## Installation
 
