@@ -169,3 +169,21 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore vectorstore
+vectorstore/
+
+# Ignore dataset directory
+data/
+
+# Ignore model directory
+model/
+
+# Ignore Python cache files
+*.pyc
+
+# Ignore Streamlit config
+.streamlit/
+
+# Ignore ngrok config
+.ngrok2/
