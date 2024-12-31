@@ -3,45 +3,62 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, TextGenerationPipeline
 import torch
 import os
 import faiss
 
 # Define paths (make sure these match your Colab notebook)
-PROJECT_ROOT = 'ecommerce-support-chatbot'
+PROJECT_ROOT = '.'  # Using relative path for Hugging Face Spaces
 VECTORSTORE_PATH = os.path.join(PROJECT_ROOT, 'vectorstore')
 INDEX_PATH = os.path.join(VECTORSTORE_PATH, "faiss_index")
 HUGGINGFACE_TOKEN = os.environ.get("HUGGINGFACE_TOKEN")
+
+# Custom wrapper for the Hugging Face pipeline
+class HuggingFacePipelineWrapper:
+    def __init__(self, pipeline):
+        self.pipeline = pipeline
+
+    def __call__(self, text, **kwargs):
+        # Call the pipeline with the provided text and any additional keyword arguments
+        return self.pipeline(text, **kwargs)[0]['generated_text']
+
+    def _llm_type(self):
+        # Return a string that identifies the type of LLM you are using
+        return "huggingface_pipeline"
 
 # Load the LLM
 @st.cache_resource
 def load_llm():
     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
     tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=f'{PROJECT_ROOT}/model/', token=HUGGINGFACE_TOKEN)
-    model = AutoModelForCausalLM.from_pretrained(model_name,
-                                                 device_map="auto",
-                                                 torch_dtype=torch.float16,
-                                                 load_in_4bit=True,
-                                                 use_flash_attention_2=False,
-                                                 bnb_4bit_compute_dtype=torch.float16,
-                                                 bnb_4bit_quant_type="nf4",
-                                                 cache_dir=f'{PROJECT_ROOT}/model/',
-                                                 token=HUGGINGFACE_TOKEN)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        device_map="auto",
+        torch_dtype=torch.float16,
+        load_in_4bit=True,
+        use_flash_attention_2=False,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_quant_type="nf4",
+        cache_dir=f'{PROJECT_ROOT}/model/',
+        token=HUGGINGFACE_TOKEN
+    )
 
-    pipe = pipeline("text-generation",
-                    model=model,
-                    tokenizer=tokenizer,
-                    use_cache=True,
-                    device_map="auto",
-                    max_new_tokens=512,
-                    min_new_tokens=50,
-                    top_k=40,
-                    num_return_sequences=1,
-                    pad_token_id=tokenizer.eos_token_id,
-                    eos_token_id=tokenizer.eos_token_id)
+    pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        use_cache=True,
+        device_map="auto",
+        max_new_tokens=512,
+        min_new_tokens=50,
+        top_k=40,
+        num_return_sequences=1,
+        pad_token_id=tokenizer.eos_token_id,
+        eos_token_id=tokenizer.eos_token_id
+    )
 
-    return pipe
+    return HuggingFacePipelineWrapper(pipe)
 
 # Load embeddings
 @st.cache_resource
@@ -51,15 +68,11 @@ def load_embeddings():
 # Load the vector store
 @st.cache_resource
 def load_vectorstore(embeddings):
-    index = faiss.read_index(os.path.join(VECTORSTORE_PATH, "index"))
-
-    # Convert the index to a GPU index if CUDA is available
-    if torch.cuda.is_available():
-        res = faiss.StandardGpuResources()
-        index = faiss.index_cpu_to_gpu(res, 0, index)
+    # Load the index from disk
+    index = faiss.read_index(os.path.join(VECTORSTORE_PATH, "index.faiss"))
 
     # Load the FAISS vector store from disk
-    db = FAISS.load_local(VECTORSTORE_PATH, embeddings)
+    db = FAISS.load_local(VECTORSTORE_PATH, embeddings, allow_dangerous_deserialization=True)
 
     # Set the loaded index for querying
     db.index = index
@@ -91,8 +104,7 @@ def create_rag_chain(llm, vectorstore):
 st.title("E-commerce Customer Support Chatbot")
 st.write("Ask me questions about products, shipping, returns, or anything else related to our store.")
 
-llm_pipeline = load_llm()
-llm = pipeline(llm_pipeline)
+llm = load_llm()
 embeddings = load_embeddings()
 vectorstore = load_vectorstore(embeddings)
 rag_chain = create_rag_chain(llm, vectorstore)
