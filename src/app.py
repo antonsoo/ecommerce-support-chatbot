@@ -67,12 +67,12 @@ def load_embeddings():
 
 # Load the vector store
 @st.cache_resource
-def load_vectorstore(embeddings):
+def load_vectorstore(_embeddings):
     # Load the index from disk
     index = faiss.read_index(os.path.join(VECTORSTORE_PATH, "index.faiss"))
 
     # Load the FAISS vector store from disk
-    db = FAISS.load_local(VECTORSTORE_PATH, embeddings, allow_dangerous_deserialization=True)
+    db = FAISS.load_local(VECTORSTORE_PATH, _embeddings, allow_dangerous_deserialization=True)
 
     # Set the loaded index for querying
     db.index = index
@@ -81,7 +81,7 @@ def load_vectorstore(embeddings):
 
 # Create the RAG chain
 @st.cache_resource
-def create_rag_chain(llm, vectorstore):
+def create_rag_chain(_llm, vectorstore):
     retriever = vectorstore.as_retriever()
     template = """
     You are a helpful customer support chatbot for an e-commerce store.
@@ -93,7 +93,7 @@ def create_rag_chain(llm, vectorstore):
     """
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
     return RetrievalQA.from_chain_type(
-        llm=llm,
+        llm=_llm,
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={"prompt": prompt},
