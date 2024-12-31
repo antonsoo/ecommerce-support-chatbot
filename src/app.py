@@ -3,7 +3,8 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, TextGenerationPipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from langchain_community.llms import HuggingFacePipeline
 import torch
 import os
 import faiss
@@ -14,24 +15,15 @@ VECTORSTORE_PATH = os.path.join(PROJECT_ROOT, 'vectorstore')
 INDEX_PATH = os.path.join(VECTORSTORE_PATH, "faiss_index")
 HUGGINGFACE_TOKEN = os.environ.get("HUGGINGFACE_TOKEN")
 
-# Custom wrapper for the Hugging Face pipeline
-class HuggingFacePipelineWrapper:
-    def __init__(self, pipeline):
-        self.pipeline = pipeline
-
-    def __call__(self, text, **kwargs):
-        # Call the pipeline with the provided text and any additional keyword arguments
-        return self.pipeline(text, **kwargs)[0]['generated_text']
-
-    def _llm_type(self):
-        # Return a string that identifies the type of LLM you are using
-        return "huggingface_pipeline"
-
 # Load the LLM
 @st.cache_resource
 def load_llm():
     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=f'{PROJECT_ROOT}/model/', token=HUGGINGFACE_TOKEN)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name, 
+        cache_dir=f'{PROJECT_ROOT}/model/', 
+        token=HUGGINGFACE_TOKEN
+    )
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto",
@@ -44,21 +36,22 @@ def load_llm():
         token=HUGGINGFACE_TOKEN
     )
 
-    pipe = pipeline(
+    text_generation_pipeline = pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
         use_cache=True,
         device_map="auto",
-        max_new_tokens=512,
-        min_new_tokens=50,
+        max_new_tokens=256,
+        min_new_tokens=20,
         top_k=40,
         num_return_sequences=1,
         pad_token_id=tokenizer.eos_token_id,
         eos_token_id=tokenizer.eos_token_id
     )
 
-    return HuggingFacePipelineWrapper(pipe)
+    llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
+    return llm
 
 # Load embeddings
 @st.cache_resource
@@ -72,32 +65,46 @@ def load_vectorstore(_embeddings):
     index = faiss.read_index(os.path.join(VECTORSTORE_PATH, "index.faiss"))
 
     # Load the FAISS vector store from disk
-    db = FAISS.load_local(VECTORSTORE_PATH, _embeddings, allow_dangerous_deserialization=True)
+    db = FAISS.load_local(
+        VECTORSTORE_PATH, 
+        _embeddings, 
+        allow_dangerous_deserialization=True
+    )
 
     # Set the loaded index for querying
     db.index = index
-
     return db
 
 # Create the RAG chain
 @st.cache_resource
-def create_rag_chain(_llm, vectorstore):
-    retriever = vectorstore.as_retriever()
-    template = """
-    You are a helpful customer support chatbot for an e-commerce store.
-    Use the following context to answer the question:
-    {context}
+def create_rag_chain(_llm, _vectorstore):
+    retriever = _vectorstore.as_retriever(search_kwargs={"k": 3})
 
-    Question: {question}
-    Answer:
+    # Clean prompt, no special tokens
+    template = """
+You are a helpful and enthusiastic customer support chatbot for an e-commerce store.
+Use the following context to answer the question.
+If the answer is not in the provided context, say that you don't know.
+Keep your answer short, polite, and relevant, and format it for readability.
+
+Context:
+{context}
+
+Question: {question}
+Answer:
     """
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
+
+    # We add stop sequences to keep the model from echoing too much
     return RetrievalQA.from_chain_type(
         llm=_llm,
         chain_type="stuff",
         retriever=retriever,
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True
+        chain_type_kwargs={
+            "prompt": prompt,
+            "stop": ["\nQuestion:", "\nContext:"]
+        },
+        return_source_documents=False
     )
 
 # Streamlit app
@@ -117,12 +124,23 @@ if st.button("Ask"):
         # Get the response from the RAG chain
         with st.spinner('Processing your request...'):
             try:
-                result = rag_chain(query)
+                result = rag_chain.invoke(query)
+                # Check if 'result' is a dictionary and extract the answer
+                if isinstance(result, dict) and 'result' in result:
+                    answer = result['result']
+                else:
+                    answer = "Could not generate an answer."
+
+                # Simple post-processing to remove any leftover tokens:
+                for token in ["<s>", "</s>", "[INST]", "[/INST]"]:
+                    answer = answer.replace(token, "")
+                answer = answer.strip()
+
                 # Display the answer
                 st.subheader("Answer:")
-                st.write(result['result'])
+                st.write(answer)
+
             except Exception as e:
                 st.error(f"An error occurred: {e}")
-
     else:
         st.warning("Please enter a question.")
