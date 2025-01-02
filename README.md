@@ -23,7 +23,9 @@ If you would like to try the demo, please ask me to re-enable the computing reso
 
 This project utilizes the **AmazonQA dataset**, a large-scale collection of question-answer pairs related to Amazon products.
 
-**Dataset Source:** [https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA](https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA)
+**Dataset Source:** 
+
+[https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA](https://github.com/amazon-research/open-question-answering-data/tree/main/AmazonQA)
 
 **Download Instructions:**
 
