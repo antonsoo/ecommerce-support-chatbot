@@ -15,7 +15,7 @@ The chatbot is designed to enhance the customer support experience by providing 
 
 ## Demo
 
-Experience the live chatbot demo here: https://huggingface.co/spaces/antonsoloviev/ecommerce-support-chatbot 
+Try out the live chatbot demo here: [Link to your Hugging Face Spaces app] (Replace with the actual link when you deploy it)
 
 ## Dataset
 
@@ -25,128 +25,121 @@ This project utilizes the **AmazonQA dataset**, a large-scale collection of ques
 
 **Download Instructions:**
 
-The dataset is not included in this repository due to its size. Please follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the dataset.
+The dataset is not included in this repository. You need to download it yourself using the provided script. Please follow these steps:
+
+1. **Install necessary libraries:**
+   ```bash
+   pip install -r requirements.txt
+
+2. **Run the download script:**
+ ```bash
+   python src/download_data.py
+ ```
+This will download the AmazonQA dataset to the data/AmazonQA directory.
+
+--------------------------------
 
 ## Project Structure
 
 ```
 ecommerce-support-chatbot/
 ├── data/
-│ └── AmazonQA/ (Place the downloaded AmazonQA dataset files here)
-│ └── faq/ (Optional: Add any additional FAQ documents here)
-│ └── HOW_TO_DOWNLOAD_DATA.md (Instructions for downloading the dataset)
+│   └── AmazonQA/ (Place the downloaded AmazonQA dataset files here)
+│   └── faq/ (Optional: Add any additional FAQ documents here)
+│   └── HOW_TO_DOWNLOAD_DATA.md (Instructions for downloading the dataset)
 ├── model/ (Directory for storing the downloaded LLM and sentence-transformer model)
 ├── vectorstore/ (Directory for storing the FAISS index)
 ├── notebooks/
-│ └── chatbot_development.ipynb (Colab notebook for development and experimentation)
+│   └── chatbot_development.ipynb (Colab notebook for development and experimentation)
 ├── src/
-│ ├── app.py (Streamlit application script)
-│ ├── train.py (Script for creating the vector store)
-│ └── download_data.py (Script to download the AmazonQA dataset)
+│   ├── app.py (Streamlit application script)
+│   ├── train.py (Script for creating the vector store)
+│   └── download_data.py (Script to download the AmazonQA dataset)
 ├── README.md
 ├── requirements.txt
 └── .gitignore
 ```
 
+--------------------------------
+
 ## Installation
 
-1. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/antonsoo/ecommerce-support-chatbot/
-    cd ecommerce-support-chatbot
-    ```
+1. **Install necessary libraries:**
+```bash
+   git clone https://github.com/antonsoo/ecommerce-support-chatbot
+   cd ecommerce-support-chatbot
+```
 
 2. **Create a virtual environment (recommended):**
+```bash
+   python3 -m venv .venv
+   source .venv/bin/activate  # On Linux/macOS
+   .venv\Scripts\activate  # On Windows
+```
 
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate  # On Linux/macOS
-    .venv\Scripts\activate  # On Windows
-    ```
-
-3. **Install dependencies:**
-
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. **Install the required packages:**
+```bash
+   pip install -r requirements.txt
+```
 
 4. **Download the dataset:**
+Follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the AmazonQA dataset and place it in the `data/AmazonQA` directory.
 
-    Follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the AmazonQA dataset and place it in the `data/AmazonQA` directory.
+--------------------------------
 
 ## Usage
 
-**To create the vector store:**
+To create the vector store:
 
 1. Make sure you have downloaded the dataset and placed it in the correct directory.
+
 2. Run the training script:
+```bash
+   streamlit run src/app.py
+```
+This will provide a temporary public URL to access your app, which can be useful for testing in restricted environments like Google Colab.
 
-    ```bash
-    python src/train.py
-    ```
+--------------------------------
 
-This will create the FAISS vector store from the dataset and save it to the `vectorstore` directory.
-
-**To run the Streamlit app locally:**
-
-1. Ensure that the vector store has been created by running `train.py`.
-2. Run the following command:
-
-    ```bash
-    streamlit run src/app.py
-    ```
-
-    This will start the Streamlit app, and you will be able to access it in your web browser (usually at `http://localhost:8501`).
-
-**To test locally using ngrok (Optional):**
-
-1. Install `ngrok` following instructions [here](https://ngrok.com/download)
-2. Update the `NGROK_AUTH_TOKEN` in the `run_ngrok()` function in the `test_locally.py` file.
-3. Run the `test_locally.py` script to start Streamlit and ngrok in separate threads:
-
-    ```bash
-    python src/test_locally.py
-    ```
-
-This will start Streamlit in the background, start `ngrok`, and provide a temporary public URL to access the app. This is useful for testing in restricted environments like Google Colab.
-
-**Deployment:**
+## Deployment:
 
 The app is deployed on Hugging Face Spaces. To deploy your own version:
 
 1. Create a Hugging Face account and a new Space, selecting "Streamlit" as the SDK.
+
 2. Connect your GitHub repository to the Space.
-3. Add your Hugging Face token as a secret named `HUGGINGFACE_TOKEN` in the Space's settings.
+
+3. Add your Hugging Face token as a secret named HUGGINGFACE_TOKEN in the Space's settings.
+
 4. Hugging Face Spaces will automatically build and deploy your app.
 
+--------------------------------
+
 ## Model Details
+*   **LLM**: mistralai/Mistral-7B-Instruct-v0.2
+*   **Embedding Model**: sentence-transformers/all-mpnet-base-v2
+*   **Vector Store**: FAISS
 
-*   **LLM:** `mistralai/Mistral-7B-Instruct-v0.2`
-*   **Embedding Model:** `sentence-transformers/all-mpnet-base-v2`
-*   **Vector Store:** FAISS
+--------------------------------
 
-## Ethical Considerations
+## Contributing
 
-*   This project uses a publicly available dataset for research and educational purposes.
-*   It is important to be aware of potential biases in the data and to use the chatbot responsibly.
-*   The chatbot is intended to be a helpful tool, but it should not be considered a replacement for human customer support agents.
+Contributions to this project are welcome! Feel free to submit pull requests or open issues to suggest improvements or report bugs.
+License
 
-## Future Improvements
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-*   Experiment with different LLMs and embedding models.
-*   Fine-tune the LLM on a domain-specific dataset.
-*   Incorporate a mechanism for handling out-of-domain or unsupported questions.
-*   Improve the user interface and add more interactive features to the Streamlit app.
-*   Evaluate the chatbot's performance using more comprehensive metrics and user studies.
+--------------------------------
+
+## Contact
+
+Anton Soloviev - UpWork: https://www.upwork.com/freelancers/~01b9d171164a005062
+
+--------------------------------
 
 ## Acknowledgements
 
-*   [Hugging Face](https://huggingface.co/) for the Transformers library, pre-trained models, and the Spaces platform.
-*   [Streamlit](https://streamlit.io/) for the web app framework.
-*   [LangChain](https://www.langchain.com/) for the RAG implementation.
+*   Hugging Face for the Transformers library, pre-trained models, and the Spaces platform.
+*   Streamlit for the easy-to-use web app framework.
+*   LangChain for the RAG implementation.
 *   The creators of the AmazonQA dataset.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
