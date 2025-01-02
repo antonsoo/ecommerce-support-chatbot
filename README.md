@@ -36,9 +36,9 @@ The dataset is not included in this repository. You need to download it yourself
    pip install -r requirements.txt
 
 2. **Run the download script:**
- ```bash
+   ```bash
    python src/download_data.py
- ```
+
 This will download the AmazonQA dataset to the data/AmazonQA directory.
 
 --------------------------------
@@ -69,22 +69,22 @@ ecommerce-support-chatbot/
 ## Installation
 
 1. **Install necessary libraries:**
-```bash
+   ```bash
    git clone https://github.com/antonsoo/ecommerce-support-chatbot
    cd ecommerce-support-chatbot
-```
+
 
 2. **Create a virtual environment (recommended):**
-```bash
+   ```bash
    python3 -m venv .venv
    source .venv/bin/activate  # On Linux/macOS
    .venv\Scripts\activate  # On Windows
-```
+
 
 3. **Install the required packages:**
-```bash
+   ```bash
    pip install -r requirements.txt
-```
+
 
 4. **Download the dataset:**
 Follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the AmazonQA dataset and place it in the `data/AmazonQA` directory.
@@ -98,9 +98,9 @@ To create the vector store:
 1. Make sure you have downloaded the dataset and placed it in the correct directory.
 
 2. Run the training script:
-```bash
+   ```bash
    streamlit run src/app.py
-```
+
 This will provide a temporary public URL to access your app, which can be useful for testing in restricted environments like Google Colab.
 
 --------------------------------
