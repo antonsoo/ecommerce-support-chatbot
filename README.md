@@ -41,8 +41,6 @@ The dataset is not included in this repository. You need to download it yourself
 
 This will download the AmazonQA dataset to the data/AmazonQA directory.
 
---------------------------------
-
 ## Project Structure
 
 ```
@@ -64,8 +62,6 @@ ecommerce-support-chatbot/
 └── .gitignore
 ```
 
---------------------------------
-
 ## Installation
 
 1. **Install necessary libraries:**
@@ -86,8 +82,6 @@ ecommerce-support-chatbot/
 4. **Download the dataset:**
 Follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the AmazonQA dataset and place it in the `data/AmazonQA` directory.
 
---------------------------------
-
 ## Usage
 
 To create the vector store:
@@ -99,8 +93,6 @@ To create the vector store:
    streamlit run src/app.py
 
 This will provide a temporary public URL to access your app, which can be useful for testing in restricted environments like Google Colab.
-
---------------------------------
 
 ## Deployment:
 
@@ -114,14 +106,10 @@ The app is deployed on Hugging Face Spaces. To deploy your own version:
 
 4. Hugging Face Spaces will automatically build and deploy your app.
 
---------------------------------
-
 ## Model Details
 *   **LLM**: mistralai/Mistral-7B-Instruct-v0.2
 *   **Embedding Model**: sentence-transformers/all-mpnet-base-v2
 *   **Vector Store**: FAISS
-
---------------------------------
 
 ## Contributing
 
@@ -130,13 +118,9 @@ License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
---------------------------------
-
 ## Contact
 
 Anton Soloviev - UpWork: https://www.upwork.com/freelancers/~01b9d171164a005062
-
---------------------------------
 
 ## Acknowledgements
 
