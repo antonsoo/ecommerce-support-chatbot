@@ -15,7 +15,8 @@ The chatbot is designed to enhance the customer support experience by providing 
 
 ## Demo
 
-Try out the live chatbot demo here: [Link to your Hugging Face Spaces app] (Replace with the actual link when you deploy it)
+Try out the live chatbot demo here: https://huggingface.co/spaces/antonsoloviev/ecommerce-support-chatbot
+If you would like to try the demo, please ask me to re-enable the computing resources on the space hosting the demo.
 
 ## Dataset
 
