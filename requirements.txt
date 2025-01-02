@@ -8,3 +8,8 @@ torch
 beautifulsoup4
 accelerate
 bitsandbytes
+peft
+datasets
+evaluate
+psutil
+pyyaml
