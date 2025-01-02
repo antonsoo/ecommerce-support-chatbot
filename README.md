@@ -73,18 +73,15 @@ ecommerce-support-chatbot/
    git clone https://github.com/antonsoo/ecommerce-support-chatbot
    cd ecommerce-support-chatbot
 
-
 2. **Create a virtual environment (recommended):**
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate  # On Linux/macOS
    .venv\Scripts\activate  # On Windows
 
-
 3. **Install the required packages:**
    ```bash
    pip install -r requirements.txt
-
 
 4. **Download the dataset:**
 Follow the instructions in `data/HOW_TO_DOWNLOAD_DATA.md` to download the AmazonQA dataset and place it in the `data/AmazonQA` directory.
